@@ -2,16 +2,42 @@
 
 /** STRING **/
 
-char* strSubstring(char* pString, uint32_t inicio, uint32_t fin) {
+char* strSubstring(char* pString, uint32_t init, uint32_t end) 
+{
 
-    return 0;
+	uint32_t len = strLen(pString);
+
+	if(init > end) return pString;
+
+    if(init > len)
+    {
+    	char* vacio = malloc(1);
+    	vacio[1] = '\0';
+    	return vacio;
+    } 
+    if(end > len) end = len;
+
+    uint32_t size = (end-init) + 1;
+
+	char* new = malloc(size + 1);
+	new[size] = '\0';
+	
+	uint32_t k = 0;
+	uint32_t j = init;
+    while(j <= end)
+    {
+    	new[k] = pString[j];
+    	k++;
+    	j++;
+    }
+    strDelete(pString);
+    return new;
+
 }
 
 /** Lista **/
 
-void listPrintReverse(list_t* pList, FILE *pFile, funcPrint_t* fp) {
 
-}
 
 /** HashTable **/
 

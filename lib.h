@@ -14,7 +14,7 @@ char* strClone(char* pString);
 uint32_t strLen(char* pString);
 int32_t strCmp(char* pStringA, char* pStringB);
 char* strConcat(char* pStringA, char* pStringB);
-char* strSubstring(char* pString, uint32_t inicio, uint32_t fin);
+char* strSubstring(char* pString, uint32_t init, uint32_t end);
 void strDelete(char* pString);
 void strPrint(char* pString, FILE *pFile);
 

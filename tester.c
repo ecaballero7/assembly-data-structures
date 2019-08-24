@@ -46,47 +46,47 @@ void test_strings(FILE *pfile) {
     fprintf(pfile,"\n");
     strDelete(a);
     strDelete(b);
-    // // concat
-    // fprintf(pfile,"==> Concat\n");
-    // a = strClone("perro_");
-    // b = strClone("loco");
-    // fprintf(pfile,"%i\n",strLen(a));
-    // fprintf(pfile,"%i\n",strLen(b));
-    // c = strConcat(a,b);
-    // strPrint(c,pfile);
-    // fprintf(pfile,"\n");
-    // c = strConcat(c,strClone(""));
-    // strPrint(c,pfile);
-    // fprintf(pfile,"\n");
-    // c = strConcat(strClone(""),c);
-    // strPrint(c,pfile);
-    // fprintf(pfile,"\n");
-    // c = strConcat(c,c);
-    // strPrint(c,pfile);
-    // fprintf(pfile,"\n");
-    // // Substring
-    // fprintf(pfile,"==> Substring\n");
-    // fprintf(pfile,"%i\n",strLen(c));
-    // int h = strLen(c);
-    // for(int i=0; i<h+1; i++) {
-    //     for(int j=0; j<h+1; j++) {    
-    //         a = strClone(c);
-    //         a = strSubstring(a,i,j);
-    //         strPrint(a,pfile);
-    //         fprintf(pfile,"\n");
-    //         strDelete(a);
-    //     }
-    //     fprintf(pfile,"\n");
-    // }
-    // strDelete(c);
-    // // cmp
-    // fprintf(pfile,"==> Cmp\n");
-    // char* texts[5] = {"sar","23","taaa","tbb","tix"};
-    // for(int i=0; i<5; i++) {
-    //     for(int j=0; j<5; j++) {
-    //         fprintf(pfile,"cmp(%s,%s) -> %i\n",texts[i],texts[j],strCmp(texts[i],texts[j]));
-    //     }
-    // }
+    // concat
+    fprintf(pfile,"==> Concat\n");
+    a = strClone("perro_");
+    b = strClone("loco");
+    fprintf(pfile,"%i\n",strLen(a));
+    fprintf(pfile,"%i\n",strLen(b));
+    c = strConcat(a,b);
+    strPrint(c,pfile);
+    fprintf(pfile,"\n");
+    c = strConcat(c,strClone(""));
+    strPrint(c,pfile);
+    fprintf(pfile,"\n");
+    c = strConcat(strClone(""),c);
+    strPrint(c,pfile);
+    fprintf(pfile,"\n");
+    c = strConcat(c,c);
+    strPrint(c,pfile);
+    fprintf(pfile,"\n");
+    // Substring
+    fprintf(pfile,"==> Substring\n");
+    fprintf(pfile,"%i\n",strLen(c));
+    int h = strLen(c);
+    for(int i=0; i<h+1; i++) {
+        for(int j=0; j<h+1; j++) {    
+            a = strClone(c);
+            a = strSubstring(a,i,j);
+            strPrint(a,pfile);
+            fprintf(pfile,"\n");
+            strDelete(a);
+        }
+        fprintf(pfile,"\n");
+    }
+    strDelete(c);
+    // cmp
+    fprintf(pfile,"==> Cmp\n");
+    char* texts[5] = {"sar","23","taaa","tbb","tix"};
+    for(int i=0; i<5; i++) {
+        for(int j=0; j<5; j++) {
+            fprintf(pfile,"cmp(%s,%s) -> %i\n",texts[i],texts[j],strCmp(texts[i],texts[j]));
+        }
+    }
 }
 
 /** List **/
@@ -278,7 +278,7 @@ void test_hashTable(FILE *pfile) {
 void test_1(char* filename){
     FILE *pfile;
     RUN(filename,test_strings(pfile););
-    // RUN(filename,test_list(pfile););
+    RUN(filename,test_list(pfile););
     // RUN(filename,test_hashTable(pfile););
 }
 
