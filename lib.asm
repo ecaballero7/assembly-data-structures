@@ -782,6 +782,8 @@ hashTableNew:
 	mov rbp, rsp
 	push r12
 	push r13
+	push r14
+	sub rsp, 8
 
 	mov r12, rdi
 	mov r13, rsi
@@ -789,17 +791,82 @@ hashTableNew:
 	mov rdi, S_HASH_TABLE_SIZE
 	call malloc
 
-	mov qword[rax+OFFSET_LIST], NULL
 	mov qword[rax+OFFSET_SIZE], r12
 	mov qword[rax+OFFSET_FUNHASH], r13
+	mov r14, rax 						;resguardo ptro a res
+	;creo una array con tamaño size
+	mov rax, S_LIST_SIZE 				;tengo el tamaño del struct list
+	mul r12 						; size * tam(list)
+	mov rdi, rax
+	call malloc							; rax = ptro al inicio del array
 
+	mov rcx, r12 						; rcx = count (puedo usar r12 directamente)
+	dec rcx
 
+.ciclo:
+	cmp rcx, -1
+	je .fin
+	sub r8, S_LIST_SIZE 						; comienzo desde la pos 0 
+	mov r8, [rax + r8]
+	mov qword[r8+OFFSET_FIRST_L], NULL
+	mov qword[r8+OFFSET_LAST_L], NULL
+	sub r8, S_LIST_SIZE
+	loop .ciclo
 
+.fin:
+	mov qword[r14+OFFSET_LIST], rax
 
+	add rsp, 8
+	push r13
+	push r12
+	push rbp
     ret
 
 ; void hashTableAdd(hashTable_t* pTable, void* data)
 hashTableAdd:
+	push rbp
+	mov rbp, rsp
+	push r12
+	push r13
+	push r14
+	push r15
+
+	mov r12, rdi 				; r12 = pTable
+	mov r13, rsi 				; r13 = data
+
+	mov rdi, r13 				; *data
+	mov rsi, qword[r12+OFFSET_FUNHASH]
+	call rsi					; rax = uin32 (funHash)
+	mov r8, rax
+
+	mov r14d, dword[r12+OFFSET_SIZE]
+	cmp r8, r14
+	jl .seguir
+	mov rax, r8
+	div r14 				; rdx = mod(funHash)
+	mov r8, rdx
+
+.seguir:
+	
+	mov r15, qword[r12*OFFSET_LIST]
+
+.cilco:
+	cmp r8, 0
+	je .insertar
+	dec r8
+	mov r15, qword[r15 + S_LIST_SIZE]
+	jmp .ciclo
+
+.insertar:
+	mov rdi, r15			; rdi = list donde agrego data
+	mov rsi, r13 			; rsi = data*
+	call listAddFirst
+
+	pop r15
+	pop r14
+	pop r13
+	pop r12
+	pop rbp
     ret
 
 ; void hashTableDeleteSlot(hashTable_t* pTable, uint32_t slot, funcDelete_t* fd)
@@ -808,4 +875,40 @@ hashTableDeleteSlot:
 
 ; void hashTableDelete(hashTable_t* pTable, funcDelete_t* fd)
 hashTableDelete:
+	push rbp
+	mov rbp, rsp
+	push r12
+	push r13
+	push r14
+	push r15
+
+	mov r12, rdi 						; r12 = pTable
+	mov r13, rsi 						; r13 = funcDelete
+	mov r14, [rdi+OFFSET_LIST] 			; r14 = arrayList*
+	mov r15, [rdi+OFFSET_SIZE] 			; r15 = contador
+	dec r15
+
+
+.ciclo:
+	mov rax, S_LIST_SIZE
+	mul r15 					; rax = contador * 16
+	mov r14, qword[r12 + rax] 	; r14 =  list a borrar
+	mov rdi, r14 				; rdi = *list
+	mov rsi, r13 				; rsi = funcDelete
+	call listDelete
+	dec r15
+	cmp r15, -1
+	je .fin
+	jmp .ciclo
+
+
+.fin:
+	mov rdi, [r12+OFFSET_LIST]
+	call free
+
+	pop r15
+	pop r14
+	pop r13
+	pop r12
+	pop rbp
     ret

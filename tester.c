@@ -258,28 +258,28 @@ void test_hashTable(FILE *pfile) {
     // hashTableAdd
     fprintf(pfile,"==> hashTableAdd\n");
     n = hashTableNew(32, (funcHash_t*)&strHash);
-    for(int s=0;s<64;s++) {
-        for(int i=0;i<10;i++) {
-            hashTableAdd(n, strClone(strings[i]));}}
-    // hashTableRemoveAll
-    fprintf(pfile,"==> hashTableRemoveAll\n");
-    for(int i=5;i<10;i++) {
-        a = strClone(strings[i]);
-        hashTableRemoveAll(n,a,(funcCmp_t*)&strCmp,(funcDelete_t*)&strDelete);
-        strDelete(a);}
-    // hashTableDeleteSlot
-    fprintf(pfile,"==> hashTableDeleteSlot\n");
-    for(int i=50;i<56;i++) {
-        hashTableDeleteSlot(n,i,(funcDelete_t*)&strDelete);}
-    hashTablePrint(n,pfile,(funcPrint_t*)&strPrint);
-    hashTableDelete(n,(funcDelete_t*)&strDelete);
+    // for(int s=0;s<64;s++) {
+    //     for(int i=0;i<10;i++) {
+    //         hashTableAdd(n, strClone(strings[i]));}}
+    // // hashTableRemoveAll
+    // fprintf(pfile,"==> hashTableRemoveAll\n");
+    // for(int i=5;i<10;i++) {
+    //     a = strClone(strings[i]);
+    //     hashTableRemoveAll(n,a,(funcCmp_t*)&strCmp,(funcDelete_t*)&strDelete);
+    //     strDelete(a);}
+    // // hashTableDeleteSlot
+    // fprintf(pfile,"==> hashTableDeleteSlot\n");
+    // for(int i=50;i<56;i++) {
+    //     hashTableDeleteSlot(n,i,(funcDelete_t*)&strDelete);}
+    // hashTablePrint(n,pfile,(funcPrint_t*)&strPrint);
+    // hashTableDelete(n,(funcDelete_t*)&strDelete);
 }
 
 void test_1(char* filename){
     FILE *pfile;
     RUN(filename,test_strings(pfile););
     RUN(filename,test_list(pfile););
-    // RUN(filename,test_hashTable(pfile););
+    RUN(filename,test_hashTable(pfile););
 }
 
 void test_2(char* filename){
