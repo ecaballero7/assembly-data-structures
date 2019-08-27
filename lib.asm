@@ -796,7 +796,7 @@ hashTableNew:
 	mov r14, rax 						;resguardo ptro a res
 	;creo una array con tamaño size
 	mov rax, S_LIST_SIZE 				;tengo el tamaño del struct list
-	mul r12 						; size * tam(list)
+	mul r12 					    	; size * tam(list)
 	mov rdi, rax
 	call malloc							; rax = ptro al inicio del array
 
@@ -806,8 +806,8 @@ hashTableNew:
 .ciclo:
 	cmp rcx, -1
 	je .fin
-	sub r8, S_LIST_SIZE 						; comienzo desde la pos 0 
-	mov r8, [rax + r8]
+	mov r8
+	mov r8, [rax + S_LIST_SIZE]
 	mov qword[r8+OFFSET_FIRST_L], NULL
 	mov qword[r8+OFFSET_LAST_L], NULL
 	sub r8, S_LIST_SIZE
@@ -850,7 +850,7 @@ hashTableAdd:
 	
 	mov r15, qword[r12*OFFSET_LIST]
 
-.cilco:
+.ciclo:
 	cmp r8, 0
 	je .insertar
 	dec r8
