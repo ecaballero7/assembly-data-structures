@@ -790,10 +790,11 @@ hashTableNew:
  
 	mov rdi, S_HASH_TABLE_SIZE
 	call malloc
+	mov r14, rax 						;r14 = *HashTable
 
 	mov dword[rax+OFFSET_SIZE_T], r12d
-	mov qword[rax+OFFSET_FUNHASH], r13
-	mov r14, rax 						;r14 = *HashTable
+	mov r9, [r13]
+	mov qword[rax+OFFSET_FUNHASH], r9
 	;creo una array con tamaño size
 	mov rax, S_LIST_SIZE 				;tengo el tamaño del struct list
 	mul r12 					    	; size * tam(list)
@@ -816,11 +817,11 @@ hashTableNew:
 .fin:
 	mov qword[r14+OFFSET_LIST], rax
 
-	push r14
-	push r13
-	push r12
-	push rbx
-	push rbp
+	pop r14
+	pop r13
+	pop r12
+	pop rbx
+	pop rbp
     ret
 
 ; void hashTableAdd(hashTable_t* pTable, void* data)
