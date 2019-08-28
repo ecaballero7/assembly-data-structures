@@ -43,7 +43,7 @@ global hashTableDelete
 
 ; Los siguiente OFFSET se corresponde con los datos declarados en struct s_Hash_Table()
 %define OFFSET_LIST         0 
-%define OFFSET_SIZE         8 
+%define OFFSET_SIZE_T       8
 %define OFFSET_FUNHASH      16
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -780,45 +780,46 @@ listPrintReverse:
 hashTableNew:
 	push rbp
 	mov rbp, rsp
+	push rbx
 	push r12
 	push r13
 	push r14
-	sub rsp, 8
 
-	mov r12, rdi
-	mov r13, rsi
-
+	mov r12d, edi 						; r12 = size
+	mov r13, rsi 						; r13 = funHash
+ 
 	mov rdi, S_HASH_TABLE_SIZE
 	call malloc
 
-	mov qword[rax+OFFSET_SIZE], r12
+	mov dword[rax+OFFSET_SIZE_T], r12d
 	mov qword[rax+OFFSET_FUNHASH], r13
-	mov r14, rax 						;resguardo ptro a res
+	mov r14, rax 						;r14 = *HashTable
 	;creo una array con tamaño size
 	mov rax, S_LIST_SIZE 				;tengo el tamaño del struct list
 	mul r12 					    	; size * tam(list)
 	mov rdi, rax
-	call malloc							; rax = ptro al inicio del array
+	call malloc							; rax = *arrayList
 
 	mov rcx, r12 						; rcx = count (puedo usar r12 directamente)
 	dec rcx
+	xor r8, r8
 
 .ciclo:
 	cmp rcx, -1
 	je .fin
-	mov r8
-	mov r8, [rax + S_LIST_SIZE]
-	mov qword[r8+OFFSET_FIRST_L], NULL
-	mov qword[r8+OFFSET_LAST_L], NULL
-	sub r8, S_LIST_SIZE
+	mov r9, [rax + r8]
+	mov qword[r9+OFFSET_FIRST_L], NULL
+	mov qword[r9+OFFSET_LAST_L], NULL
+	add r8, S_LIST_SIZE
 	loop .ciclo
 
 .fin:
 	mov qword[r14+OFFSET_LIST], rax
 
-	add rsp, 8
+	push r14
 	push r13
 	push r12
+	push rbx
 	push rbp
     ret
 
@@ -839,7 +840,7 @@ hashTableAdd:
 	call rsi					; rax = uin32 (funHash)
 	mov r8, rax
 
-	mov r14d, dword[r12+OFFSET_SIZE]
+	mov r14d, dword[r12+OFFSET_SIZE_T]
 	cmp r8, r14
 	jl .seguir
 	mov rax, r8
@@ -885,7 +886,7 @@ hashTableDelete:
 	mov r12, rdi 						; r12 = pTable
 	mov r13, rsi 						; r13 = funcDelete
 	mov r14, [rdi+OFFSET_LIST] 			; r14 = arrayList*
-	mov r15, [rdi+OFFSET_SIZE] 			; r15 = contador
+	mov r15, [rdi+OFFSET_SIZE_T] 			; r15 = contador
 	dec r15
 
 
