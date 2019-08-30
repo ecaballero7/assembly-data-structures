@@ -808,14 +808,17 @@ hashTableNew:
 .ciclo:
 	cmp rcx, -1
 	je .fin
-	mov r9, [rax + r8]
-	mov qword[r9+OFFSET_FIRST_L], NULL
+	;mov r9, [rax + r8]
+	add rax, r8
+    mov r9, rax 
+    mov qword[r9+OFFSET_FIRST_L], NULL
 	mov qword[r9+OFFSET_LAST_L], NULL
 	add r8, S_LIST_SIZE
 	loop .ciclo
 
 .fin:
 	mov qword[r14+OFFSET_LIST], rax
+    mov rax, r14
 
 	pop r14
 	pop r13
@@ -879,28 +882,30 @@ hashTableDeleteSlot:
 hashTableDelete:
 	push rbp
 	mov rbp, rsp
+    push rbx
 	push r12
 	push r13
 	push r14
-	push r15
 
 	mov r12, rdi 						; r12 = pTable
 	mov r13, rsi 						; r13 = funcDelete
 	mov r14, [rdi+OFFSET_LIST] 			; r14 = arrayList*
-	mov r15, [rdi+OFFSET_SIZE_T] 			; r15 = contador
-	dec r15
+	mov rbx, [rdi+OFFSET_SIZE_T] 			; r15 = contador
+	;dec rbx
 
+    mov rax, S_LIST_SIZE
+    mul rbx                     ; rax = contador * 16
+    mov rbx, rax                ; rbx = (size_t-1) * 16
+    xor r15, r15                ; r15 = count
 
 .ciclo:
-	mov rax, S_LIST_SIZE
-	mul r15 					; rax = contador * 16
-	mov r14, qword[r12 + rax] 	; r14 =  list a borrar
-	mov rdi, r14 				; rdi = *list
+	mov r8, qword[r14 + r15] 	; r14 =  list a borrar
+	mov rdi, r8 				; rdi = *list
 	mov rsi, r13 				; rsi = funcDelete
 	call listDelete
-	dec r15
-	cmp r15, -1
-	je .fin
+	add r15, S_LIST_SIZE
+	cmp r15, rbx
+	jg .fin
 	jmp .ciclo
 
 
@@ -908,9 +913,9 @@ hashTableDelete:
 	mov rdi, [r12+OFFSET_LIST]
 	call free
 
-	pop r15
 	pop r14
 	pop r13
 	pop r12
 	pop rbp
+    pop rbx
     ret

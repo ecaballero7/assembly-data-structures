@@ -272,7 +272,7 @@ void test_hashTable(FILE *pfile) {
     // for(int i=50;i<56;i++) {
     //     hashTableDeleteSlot(n,i,(funcDelete_t*)&strDelete);}
     // hashTablePrint(n,pfile,(funcPrint_t*)&strPrint);
-    // hashTableDelete(n,(funcDelete_t*)&strDelete);
+    hashTableDelete(n,(funcDelete_t*)&strDelete);
 }
 
 void test_1(char* filename){
