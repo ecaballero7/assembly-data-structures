@@ -793,8 +793,7 @@ hashTableNew:
 	mov r14, rax 						;r14 = *HashTable
 
 	mov dword[rax+OFFSET_SIZE_T], r12d
-	mov r9, [r13]
-	mov qword[rax+OFFSET_FUNHASH], r9
+	mov qword[rax+OFFSET_FUNHASH], r13
 	;creo una array con tamaño size
 	mov rax, S_LIST_SIZE 				;tengo el tamaño del struct list
 	mul r12 					    	; size * tam(list)
@@ -899,13 +898,13 @@ hashTableDelete:
     xor r15, r15                ; r15 = count
 
 .ciclo:
-	mov r8, qword[r14 + r15] 	; r14 =  list a borrar
-	mov rdi, r8 				; rdi = *list
+	;mov r8, qword[r14 + r15] 	; r14 =  list a borrar
+	mov rdi, qword[r14 + r15] 				; rdi = *list
 	mov rsi, r13 				; rsi = funcDelete
 	call listDelete
 	add r15, S_LIST_SIZE
 	cmp r15, rbx
-	jg .fin
+	je .fin
 	jmp .ciclo
 
 
