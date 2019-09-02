@@ -799,6 +799,7 @@ hashTableNew:
 	mul r12 					    	; size * tam(list)
 	mov rdi, rax
 	call malloc							; rax = *arrayList
+    mov r10, rax
 
 	mov rcx, r12 						; rcx = count (puedo usar r12 directamente)
 	dec rcx
@@ -816,7 +817,7 @@ hashTableNew:
 	loop .ciclo
 
 .fin:
-	mov qword[r14+OFFSET_LIST], rax
+	mov qword[r14+OFFSET_LIST], r10
     mov rax, r14
 
 	pop r14
@@ -897,24 +898,29 @@ hashTableDelete:
     mov rbx, rax                ; rbx = (size_t-1) * 16
     xor r15, r15                ; r15 = count
 
-.ciclo:
-	;mov r8, qword[r14 + r15] 	; r14 =  list a borrar
-	mov rdi, qword[r14 + r15] 				; rdi = *list
-	mov rsi, r13 				; rsi = funcDelete
-	call listDelete
-	add r15, S_LIST_SIZE
-	cmp r15, rbx
-	je .fin
-	jmp .ciclo
+; .ciclo:
+; 	;mov r8, qword[r14 + r15] 	; r14 =  list a borrar
+; 	mov rdi, qword[r14 + r15] 				; rdi = *list
+; 	mov rsi, r13 				; rsi = funcDelete
+;     cmp rdi, NULL
+;     je .saltar
+; 	call listDelete
+; .saltar:
+; 	add r15, S_LIST_SIZE
+; 	cmp r15, rbx
+; 	je .fin
+; 	jmp .ciclo
 
 
 .fin:
 	mov rdi, [r12+OFFSET_LIST]
 	call free
+    mov rdi, r12
+    call free
 
 	pop r14
 	pop r13
 	pop r12
-	pop rbp
     pop rbx
+    pop rbp
     ret
