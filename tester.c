@@ -257,10 +257,10 @@ void test_hashTable(FILE *pfile) {
     fprintf(pfile,"dado=%i\n", strHash("dado"));
     // hashTableAdd
     fprintf(pfile,"==> hashTableAdd\n");
-    n = hashTableNew(3, (funcHash_t*)&strHash);
-    // for(int s=0;s<64;s++) {
-    //     for(int i=0;i<10;i++) {
-    //         hashTableAdd(n, strClone(strings[i]));}}
+    n = hashTableNew(1, (funcHash_t*)&strHash);
+    //for(int s=0;s<2;s++) {
+    //    for(int i=0;i<4;i++) {
+            hashTableAdd(n, strClone(strings[4]));//}}
     // // hashTableRemoveAll
     // fprintf(pfile,"==> hashTableRemoveAll\n");
     // for(int i=5;i<10;i++) {

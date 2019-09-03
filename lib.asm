@@ -808,9 +808,8 @@ hashTableNew:
 .ciclo:
 	cmp rcx, -1
 	je .fin
-	;mov r9, [rax + r8]
-	add rax, r8
-    mov r9, rax 
+	;add rax, r8
+    lea r9, [rax+r8] 
     mov qword[r9+OFFSET_FIRST_L], NULL
 	mov qword[r9+OFFSET_LAST_L], NULL
 	add r8, S_LIST_SIZE
@@ -853,7 +852,7 @@ hashTableAdd:
 
 .seguir:
 	
-	mov r15, qword[r12*OFFSET_LIST]
+	mov r15, qword[r12+OFFSET_LIST]
 
 .ciclo:
 	cmp r8, 0
@@ -865,7 +864,7 @@ hashTableAdd:
 .insertar:
 	mov rdi, r15			; rdi = list donde agrego data
 	mov rsi, r13 			; rsi = data*
-	call listAddFirst
+	call listAddLast
 
 	pop r15
 	pop r14
@@ -890,26 +889,27 @@ hashTableDelete:
 	mov r12, rdi 						; r12 = pTable
 	mov r13, rsi 						; r13 = funcDelete
 	mov r14, [rdi+OFFSET_LIST] 			; r14 = arrayList*
-	mov rbx, [rdi+OFFSET_SIZE_T] 			; r15 = contador
+	mov rbx, [rdi+OFFSET_SIZE_T] 		; rbx = size_t
 	;dec rbx
 
     mov rax, S_LIST_SIZE
-    mul rbx                     ; rax = contador * 16
-    mov rbx, rax                ; rbx = (size_t-1) * 16
-    xor r15, r15                ; r15 = count
+    mul rbx                     		; rax = contador * 16
+    mov rbx, rax                		; rbx = (size_t-1) * 16
+    ;xor r15, r15                		; r15 = count
+    sub rbx, 16
 
-; .ciclo:
-; 	;mov r8, qword[r14 + r15] 	; r14 =  list a borrar
-; 	mov rdi, qword[r14 + r15] 				; rdi = *list
-; 	mov rsi, r13 				; rsi = funcDelete
-;     cmp rdi, NULL
-;     je .saltar
-; 	call listDelete
-; .saltar:
-; 	add r15, S_LIST_SIZE
-; 	cmp r15, rbx
-; 	je .fin
-; 	jmp .ciclo
+.ciclo:
+	;mov r8, qword[r14 + r15] 			; r14 =  list a borrar
+	mov rdi, qword[r14 + rbx]   		; rdi = *list
+	mov rsi, r13 						; rsi = funcDelete
+    cmp rdi, NULL
+    je .saltar
+	call listDelete
+.saltar:
+	sub rbx, S_LIST_SIZE
+	cmp rbx, 0
+	jl .fin
+	jmp .ciclo
 
 
 .fin:
