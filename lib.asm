@@ -782,7 +782,7 @@ hashTableNew:
 	mov rbp, rsp
 	push rbx
 	push r12
-	push r13
+	push r13 
 	push r14
 
 	mov r12d, edi 						; r12 = size
@@ -792,31 +792,29 @@ hashTableNew:
 	call malloc
 	mov r14, rax 						;r14 = *HashTable
 
-	mov dword[rax+OFFSET_SIZE_T], r12d
+	mov qword[rax+OFFSET_SIZE_T], r12 	;tengo que usar 4bytes 
 	mov qword[rax+OFFSET_FUNHASH], r13
 	;creo una array con tamaño size
-	mov rax, S_LIST_SIZE 				;tengo el tamaño del struct list
-	mul r12 					    	; size * tam(list)
+	mov rax, 8 							;tengo el tamaño del struct list
+	mul r12 					    	; size(list) * 8
 	mov rdi, rax
 	call malloc							; rax = *arrayList
-    mov r10, rax
+    mov r13, rax 						; r13 = rax = *arraylist
 
-	mov rcx, r12 						; rcx = count (puedo usar r12 directamente)
-	dec rcx
-	xor r8, r8
+	dec r12 							; r12 = count
+	xor rbx, rbx
 
 .ciclo:
-	cmp rcx, -1
+	cmp r12, -1
 	je .fin
-	;add rax, r8
-    lea r9, [rax+r8] 
-    mov qword[r9+OFFSET_FIRST_L], NULL
-	mov qword[r9+OFFSET_LAST_L], NULL
-	add r8, S_LIST_SIZE
-	loop .ciclo
+	call listNew
+    mov qword[r13+rbx], rax 
+  	add rbx, 8
+	dec r12
+	jmp .ciclo
 
 .fin:
-	mov qword[r14+OFFSET_LIST], r10
+	mov qword[r14+OFFSET_LIST], r13
     mov rax, r14
 
 	pop r14
@@ -835,35 +833,38 @@ hashTableAdd:
 	push r14
 	push r15
 
-	mov r12, rdi 				; r12 = pTable
-	mov r13, rsi 				; r13 = data
+	mov r12, rdi 						; r12 = pTable
+	mov r13, rsi 						; r13 = data
 
-	mov rdi, r13 				; *data
-	mov rsi, qword[r12+OFFSET_FUNHASH]
-	call rsi					; rax = uin32 (funHash)
+	xor rax, rax
+	mov rdi, r13 						; *data
+	call qword[r12+OFFSET_FUNHASH]
+			 							; rax = uin32 (funHash)
 	mov r8, rax
 
 	mov r14d, dword[r12+OFFSET_SIZE_T]
 	cmp r8, r14
-	jl .seguir
+	jg .seguir
+	je .seguir
 	mov rax, r8
-	div r14 				; rdx = mod(funHash)
+	div r14 							; rdx = mod(funHash)
 	mov r8, rdx
 
 .seguir:
 	
-	mov r15, qword[r12+OFFSET_LIST]
+	mov r15, qword[r12+OFFSET_LIST] 	; r15 = *list
 
 .ciclo:
+
 	cmp r8, 0
 	je .insertar
 	dec r8
-	mov r15, qword[r15 + S_LIST_SIZE]
+	mov r15, qword[r15 + 8]
 	jmp .ciclo
 
 .insertar:
-	mov rdi, r15			; rdi = list donde agrego data
-	mov rsi, r13 			; rsi = data*
+	mov rdi, [r15]						; rdi = list donde agrego data
+	mov rsi, r13 						; rsi = data*
 	call listAddLast
 
 	pop r15
@@ -892,21 +893,20 @@ hashTableDelete:
 	mov rbx, [rdi+OFFSET_SIZE_T] 		; rbx = size_t
 	;dec rbx
 
-    mov rax, S_LIST_SIZE
+    mov rax, 8 							; rax = size(*ptro)
     mul rbx                     		; rax = contador * 16
     mov rbx, rax                		; rbx = (size_t-1) * 16
     ;xor r15, r15                		; r15 = count
-    sub rbx, 16
+    sub rbx, 8
 
 .ciclo:
-	;mov r8, qword[r14 + r15] 			; r14 =  list a borrar
 	mov rdi, qword[r14 + rbx]   		; rdi = *list
 	mov rsi, r13 						; rsi = funcDelete
     cmp rdi, NULL
     je .saltar
 	call listDelete
 .saltar:
-	sub rbx, S_LIST_SIZE
+	sub rbx, 8
 	cmp rbx, 0
 	jl .fin
 	jmp .ciclo
