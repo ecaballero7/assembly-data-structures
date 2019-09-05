@@ -844,8 +844,7 @@ hashTableAdd:
 
 	mov r14d, dword[r12+OFFSET_SIZE_T]
 	cmp r8, r14
-	jg .seguir
-	je .seguir
+	jl .seguir
 	mov rax, r8
 	div r14 							; rdx = mod(funHash)
 	mov r8, rdx
@@ -876,6 +875,21 @@ hashTableAdd:
 
 ; void hashTableDeleteSlot(hashTable_t* pTable, uint32_t slot, funcDelete_t* fd)
 hashTableDeleteSlot:
+    push rbp
+    mov rbp, rsp
+    push rbx
+    push r12
+    push r13
+    push r14
+
+    mov rbx, rdi                ; rbx = pTable
+    mov r12, rsi                ; r12 = slot
+    mov r13, rdx                ; r13 = fdelete
+
+    xor r14, r14                ; r14 = count
+
+
+
     ret
 
 ; void hashTableDelete(hashTable_t* pTable, funcDelete_t* fd)
