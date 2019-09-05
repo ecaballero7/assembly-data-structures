@@ -61,5 +61,6 @@ hashTable_t* hashTableNew(uint32_t size, funcHash_t* fh);
 void hashTableAdd(hashTable_t* pTable, void* data);
 void hashTableRemoveAll(hashTable_t* pTable, void* data, funcCmp_t* fc, funcDelete_t* fd);
 void hashTableDeleteSlot(hashTable_t* pTable, uint32_t slot, funcDelete_t* fd);
+void hashTableDeleteSlot2(hashTable_t* pTable, uint32_t i, void* data, funcDelete_t* fd);
 void hashTableDelete(hashTable_t* pTable, funcDelete_t* fd);
 void hashTablePrint(hashTable_t* pTable, FILE *pFile, funcPrint_t* fp);

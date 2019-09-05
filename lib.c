@@ -48,10 +48,28 @@ uint32_t strHash(char* pString) {
       return 0;
 }
 
-void hashTableRemoveAll(hashTable_t* pTable, void* data, funcCmp_t* fc, funcDelete_t* fd) {
+void hashTableRemoveAll(hashTable_t* pTable, void* data, funcCmp_t* fc, funcDelete_t* fd) 
+{
+	for(uint32_t i = 0; i < pTable->size ; i++)
+	{
+		hashTableDeleteSlot2(pTable, i, data, fd);
+	}
 
 }
 
-void hashTablePrint(hashTable_t* pTable, FILE *pFile, funcPrint_t* fp) {
+void hashTableDeleteSlot2(hashTable_t* pTable, uint32_t i, void* data, funcDelete_t* fd)
+{
+	return 0;
+}
 
+void hashTablePrint(hashTable_t* pTable, FILE *pFile, funcPrint_t* fp) 
+{
+	list_t** slots = pTable->listArray;
+
+	for(uint32_t i = 0; i < pTable->size; i++)
+	{
+		fprintf(pFile, "%d", i ); fprintf(pFile, "=" );
+		listPrint(slots[i], pFile, fp);
+		fprintf(pFile, "\n");
+	}
 }

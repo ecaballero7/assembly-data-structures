@@ -846,6 +846,7 @@ hashTableAdd:
 	cmp r8, r14
 	jl .seguir
 	mov rax, r8
+	xor rdx, rdx
 	div r14 							; rdx = mod(funHash)
 	mov r8, rdx
 
@@ -888,8 +889,36 @@ hashTableDeleteSlot:
 
     xor r14, r14                ; r14 = count
 
+	mov r14d, dword[r12+OFFSET_SIZE_T]
+	cmp r8, r14
+	jl .seguir
+	mov rax, r8
+	xor rdx, rdx
+	div r14 							; rdx = mod(funHash)
+	mov r8, rdx
 
+.seguir:
+	
+	mov r15, qword[r12+OFFSET_LIST] 	; r15 = *list
 
+.ciclo:
+
+	cmp r8, 0
+	je .insertar
+	dec r8
+	mov r15, qword[r15 + 8]
+	jmp .ciclo
+
+.insertar:
+	mov rdi, [r15]						; rdi = list donde agrego data
+	mov rsi, r13 						; rsi = data*
+	call listAddLast
+
+	pop r14
+	pop r13
+	pop r12
+	pop rbx
+	pop rbp
     ret
 
 ; void hashTableDelete(hashTable_t* pTable, funcDelete_t* fd)
