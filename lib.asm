@@ -800,7 +800,6 @@ hashTableNew:
 	mov rdi, rax
 	call malloc							; rax = *arrayList
     mov r13, rax 						; r13 = rax = *arraylist
-
 	dec r12 							; r12 = count
 	xor rbx, rbx
 
@@ -826,51 +825,50 @@ hashTableNew:
 
 ; void hashTableAdd(hashTable_t* pTable, void* data)
 hashTableAdd:
-	push rbp
-	mov rbp, rsp
-	push r12
-	push r13
-	push r14
-	push r15
+    push rbp
+    mov rbp, rsp
+    push r12
+    push r13
+    push r14
+    push r15
 
-	mov r12, rdi 						; r12 = pTable
-	mov r13, rsi 						; r13 = data
+    mov r12, rdi                        ; r12 = pTable
+    mov r13, rsi                        ; r13 = data
 
-	xor rax, rax
-	mov rdi, r13 						; *data
-	call qword[r12+OFFSET_FUNHASH]
-			 							; rax = uin32 (funHash)
-	mov r8, rax                         ; r8 = i_hash
+    ;xor rax, rax
+    mov rdi, r13                        ; *data
+    call qword[r12+OFFSET_FUNHASH]
+                                        ; rax = uin32 (funHash)
+    mov r8, rax
 
-	mov r14d, dword[r12+OFFSET_SIZE_T]  ;r14 = sise_t
-	cmp r8, r14
-	jl .seguir
-	mov rax, r8
-	xor rdx, rdx
-	div r14 							; rdx = mod(funHash)
-	mov r8, rdx
+    mov r14d, dword[r12+OFFSET_SIZE_T]
+    cmp r8, r14
+    jl .seguir
+    mov rax, r8
+    xor rdx, rdx
+    div r14                             ; rdx = mod(funHash)
+    mov r8, rdx
 
 .seguir:
-	
-	mov r15, qword[r12+OFFSET_LIST] 	; r15 = *list
+    mov r15, qword[r12+OFFSET_LIST]     ; r15 = *list
 
 .ciclo:
-	cmp r8, 0
-	je .insertar
-	dec r8
-	mov r15, qword[r15 + 8]
-	jmp .ciclo
+    cmp r8, 0
+    je .insertar
+    dec r8
+    add r15, 8
+    jmp .ciclo
 
 .insertar:
-	mov rdi, r15						; rdi = list donde agrego data
-	mov rsi, r13 						; rsi = data*
-	call listAddLast
+    mov rdi, [r15]                      ; rdi = list donde agrego data
+    mov rsi, r13                        ; rsi = data*
+    call listAddLast
 
-	pop r15
-	pop r14
-	pop r13
-	pop r12
-	pop rbp
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    pop rbp
     ret
 
 ; void hashTableDeleteSlot(hashTable_t* pTable, uint32_t slot, funcDelete_t* fd)
@@ -878,37 +876,31 @@ hashTableDeleteSlot:
     push rbp
     mov rbp, rsp
 
-    ;mov rbx, rdi                ; rbx = pTable
-    ;mov r12, rsi                ; r12 = slot
-    ;mov r13, rdx                ; r13 = fdelete
-
     mov r9d, esi                       ;r9 = slot
-	mov r8d, dword[rbx+OFFSET_SIZE_T]  ;r8 = sise_t
-	cmp r9, r8
-	jl .seguir
-	mov rax, r9
-	xor rdx, rdx
-	div r8 							; rdx = mod(funHash)
-	mov r8, rdx
+    mov r8d, dword[rdi+OFFSET_SIZE_T]  ;r8 = sise_t
+    cmp r9, r8
+    jl .seguir
+    mov rax, r9
+    xor rdx, rdx
+    div r8                          ; rdx = mod(funHash)
+    mov r8, rdx
 
 .seguir:
-	
-	mov r10, qword[rdi+OFFSET_LIST] 	; r10 = *list
+    mov r10, qword[rdi+OFFSET_LIST]     ; r10 = *list
 
 .ciclo:
-
-	cmp r9, 0
-	je .eliminar
-	dec r9
-	mov r10, qword[r10 + 8]
-	jmp .ciclo
+    cmp r9, 0
+    je .eliminar
+    dec r9
+    mov r10, qword[r10 + 8]
+    jmp .ciclo
 
 .eliminar:
-	mov rdi, r10						; rdi = list donde agrego data
-    mov rsi, rdx   						; rsi = data*
-	call listDelete
+    mov rdi, r10                        ; rdi = list donde agrego data
+    mov rsi, rdx                        ; rsi = data*
+    call listDelete
 
-	pop rbp
+    pop rbp
     ret
 
 ; void hashTableDelete(hashTable_t* pTable, funcDelete_t* fd)
@@ -924,8 +916,7 @@ hashTableDelete:
 	mov r13, rsi 						; r13 = funcDelete
 	mov r14, [rdi+OFFSET_LIST] 			; r14 = arrayList*
 	mov rbx, [rdi+OFFSET_SIZE_T] 		; rbx = size_t
-	;dec rbx
-
+	
     mov rax, 8 							; rax = size(*ptro)
     mul rbx                     		; rax = contador * 16
     mov rbx, rax                		; rbx = (size_t-1) * 16
@@ -943,7 +934,6 @@ hashTableDelete:
 	cmp rbx, 0
 	jl .fin
 	jmp .ciclo
-
 
 .fin:
 	mov rdi, [r12+OFFSET_LIST]
