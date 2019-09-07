@@ -840,9 +840,9 @@ hashTableAdd:
 	mov rdi, r13 						; *data
 	call qword[r12+OFFSET_FUNHASH]
 			 							; rax = uin32 (funHash)
-	mov r8, rax
+	mov r8, rax                         ; r8 = i_hash
 
-	mov r14d, dword[r12+OFFSET_SIZE_T]
+	mov r14d, dword[r12+OFFSET_SIZE_T]  ;r14 = sise_t
 	cmp r8, r14
 	jl .seguir
 	mov rax, r8
@@ -855,7 +855,6 @@ hashTableAdd:
 	mov r15, qword[r12+OFFSET_LIST] 	; r15 = *list
 
 .ciclo:
-
 	cmp r8, 0
 	je .insertar
 	dec r8
@@ -863,7 +862,7 @@ hashTableAdd:
 	jmp .ciclo
 
 .insertar:
-	mov rdi, [r15]						; rdi = list donde agrego data
+	mov rdi, r15						; rdi = list donde agrego data
 	mov rsi, r13 						; rsi = data*
 	call listAddLast
 
@@ -878,46 +877,37 @@ hashTableAdd:
 hashTableDeleteSlot:
     push rbp
     mov rbp, rsp
-    push rbx
-    push r12
-    push r13
-    push r14
 
-    mov rbx, rdi                ; rbx = pTable
-    mov r12, rsi                ; r12 = slot
-    mov r13, rdx                ; r13 = fdelete
+    ;mov rbx, rdi                ; rbx = pTable
+    ;mov r12, rsi                ; r12 = slot
+    ;mov r13, rdx                ; r13 = fdelete
 
-    xor r14, r14                ; r14 = count
-
-	mov r14d, dword[r12+OFFSET_SIZE_T]
-	cmp r8, r14
+    mov r9d, esi                       ;r9 = slot
+	mov r8d, dword[rbx+OFFSET_SIZE_T]  ;r8 = sise_t
+	cmp r9, r8
 	jl .seguir
-	mov rax, r8
+	mov rax, r9
 	xor rdx, rdx
-	div r14 							; rdx = mod(funHash)
+	div r8 							; rdx = mod(funHash)
 	mov r8, rdx
 
 .seguir:
 	
-	mov r15, qword[r12+OFFSET_LIST] 	; r15 = *list
+	mov r10, qword[rdi+OFFSET_LIST] 	; r10 = *list
 
 .ciclo:
 
-	cmp r8, 0
-	je .insertar
-	dec r8
-	mov r15, qword[r15 + 8]
+	cmp r9, 0
+	je .eliminar
+	dec r9
+	mov r10, qword[r10 + 8]
 	jmp .ciclo
 
-.insertar:
-	mov rdi, [r15]						; rdi = list donde agrego data
-	mov rsi, r13 						; rsi = data*
-	call listAddLast
+.eliminar:
+	mov rdi, r10						; rdi = list donde agrego data
+    mov rsi, rdx   						; rsi = data*
+	call listDelete
 
-	pop r14
-	pop r13
-	pop r12
-	pop rbx
 	pop rbp
     ret
 
