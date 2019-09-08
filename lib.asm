@@ -17,6 +17,7 @@ global listRemove
 global listRemoveFirst
 global listRemoveLast
 global listDelete
+global listDelete2
 global listPrint
 global listPrintReverse
 global hashTableNew
@@ -93,9 +94,9 @@ strClone:
 
     xor rax, rax
 
-    mov r12, rdi            ; r12 = *a (para llamar a strLen)
-    call strLen             ; eax = len(a)
-    mov r13, rax            ; r13 = eax = len(a)
+    mov r12, rdi            ; r12 = *pString (para llamar a strLen)
+    call strLen             ; eax = len(pString)
+    mov r13, rax            ; r13 = eax = len(pString)
     mov rdi, rax            ; solo lo uso para llamar a malloc! puedo usarlo tmb en .ciclo con loop
     inc rdi                 ; aumento la long en 1 para terminar el string en "0"
     call malloc             ; rax = puntero al nuevo string *new
@@ -116,7 +117,7 @@ strClone:
     mov byte[rax+rcx], NULL
 
 .fin:
-    mov rax, r8             ; devuelve puntero *a
+    mov rax, r8             ; devuelve puntero *pString
     add rsp, 8
     pop r14
     pop r13
@@ -173,8 +174,8 @@ strCmp:
     xor r8, r8
     
 .ciclo:
-    mov r8b, byte[r12+rax]          ;r8b = itera sobre a
-    mov r9b, byte[r13+rax]          ;r9b = itera sobre b
+    mov r8b, byte[r12+rax]          ;r8b = itera sobre pStringA
+    mov r9b, byte[r13+rax]          ;r9b = itera sobre pStringB
     inc rax
     cmp r9b, r8b                    ; comparo char by char
     je .ciclo                       ; si son iguales, sigo iterando
@@ -204,23 +205,23 @@ push rbp
     push r13
     push r14
 
-    mov r12, rdi        ; resguardo los punteros a cada char r12 = a
-    mov r13, rsi        ; r13 = b
+    mov r12, rdi        ; resguardo los punteros a cada char r12 = pStringA
+    mov r13, rsi        ; r13 = pStringB
     
     call strLen
-    mov rbx, rax        ; rbx = len(a)
+    mov rbx, rax        ; rbx = len(pStringA)
 
     mov rdi, r13
-    call strLen        ; rax = len(b)
+    call strLen        ; rax = len(pStringB)
 
-    mov rdi, rbx        ; rdi = len(a)
-    add rdi, rax        ; rdi = len(a) + len(b)
+    mov rdi, rbx        ; rdi = len(pStringA)
+    add rdi, rax        ; rdi = len(pStringA) + len(pStringB)
     inc rdi             
 
-    call malloc         ; rax = puntero new struct char (len(a)+len(b))
+    call malloc         ; rax = puntero new struct char (len(pStringA)+len(pStringB))
     xor rcx, rcx        ; contador para new
-    xor r8, r8          ; contador para A
-    xor r9, r9          ; contador para B
+    xor r8, r8          ; contador para pStringA
+    xor r9, r9          ; contador para pStringB
 
 .cicloA:
     mov r14b, byte[r12+r8]
@@ -330,7 +331,7 @@ listAddFirst:
     push rbx
     push r12
     
-    mov rbx, rdi                            ;rbx = l
+    mov rbx, rdi                            ;rbx = pList
     mov r12, rsi                            ;r12 = data
     mov rdi, S_LIST_ELEM_SIZE               ;para pedir memoria p/ s_listElem 
     call malloc
@@ -366,7 +367,7 @@ listAddLast:
     push rbx
     push r12
 
-    mov rbx, rdi                                    ;rbx = list
+    mov rbx, rdi                                    ;rbx = plist
     mov r12, rsi                                    ;r12 = data
 
     mov rdi, S_LIST_ELEM_SIZE
@@ -677,6 +678,36 @@ listDelete:
     pop rbp
     ret
 
+listDelete2:
+    push rbp
+    mov rbp, rsp
+    push rbx
+    push r12
+    push r13
+    sub rsp, 8
+                                                ;rsi = funcDelete_t*
+    mov rbx, rdi                                ;rbx = rdi
+    mov r13, rsi                                ;r13 = rsi = fd
+
+.while: 
+    mov r12, qword[rbx+OFFSET_FIRST_L]          ;r12 = fisrt(it)
+    mov rdi, rbx                                ;recupero list
+    mov rsi, r13
+    cmp r12, NULL                               ;si r12 es Null termine de recorrer
+    je .finish
+    call listRemoveFirst
+    jmp .while
+
+.finish:
+    mov rax, rbx
+
+    add rsp, 8
+    pop r13
+    pop r12
+    pop rbx
+    pop rbp
+    ret
+
 ; void listPrint(list_t* pList, FILE *pFile, funcPrint_t* fp)
 listPrint:
     push rbp
@@ -875,6 +906,10 @@ hashTableAdd:
 hashTableDeleteSlot:
     push rbp
     mov rbp, rsp
+    push rbx
+    push r12
+
+    ;mov rbx, rdi                       ;rbx = rdi = pTable
 
     mov r9d, esi                       ;r9 = slot
     mov r8d, dword[rdi+OFFSET_SIZE_T]  ;r8 = sise_t
@@ -883,23 +918,26 @@ hashTableDeleteSlot:
     mov rax, r9
     xor rdx, rdx
     div r8                          ; rdx = mod(funHash)
-    mov r8, rdx
+    mov r9, rdx
 
 .seguir:
     mov r10, qword[rdi+OFFSET_LIST]     ; r10 = *list
+    xor r8, r8
 
 .ciclo:
-    cmp r9, 0
+    cmp r8, r9
     je .eliminar
-    dec r9
-    mov r10, qword[r10 + 8]
+    inc r8
+    mov r11, qword[r10 + r8*8]
     jmp .ciclo
 
 .eliminar:
-    mov rdi, r10                        ; rdi = list donde agrego data
+    mov rdi, r11                        ; rdi = list donde agrego data
     mov rsi, rdx                        ; rsi = data*
-    call listDelete
+    call listDelete2
 
+    pop r12
+    pop rbx
     pop rbp
     ret
 

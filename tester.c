@@ -24,10 +24,10 @@ int main() {
     srand(12345);
     remove(filename_1);
     test_1();
-    // remove(filename_2);
-    // test_2();
-    // remove(filename_3);
-    // test_3();  
+    remove(filename_2);
+    test_2();
+    remove(filename_3);
+    test_3();  
     return 0;
 }
 
@@ -263,14 +263,14 @@ void test_hashTable(FILE *pfile) {
             hashTableAdd(n, strClone(strings[i]));}}
     // hashTableRemoveAll
     fprintf(pfile,"==> hashTableRemoveAll\n");
-    // for(int i=5;i<10;i++) {
-    //     a = strClone(strings[i]);
-    //     hashTableRemoveAll(n,a,(funcCmp_t*)&strCmp,(funcDelete_t*)&strDelete);
-    //     strDelete(a);}
-    // // hashTableDeleteSlot
+    for(int i=5;i<10;i++) {
+        a = strClone(strings[i]);
+        hashTableRemoveAll(n,a,(funcCmp_t*)&strCmp,(funcDelete_t*)&strDelete);
+        strDelete(a);}
+    // hashTableDeleteSlot
     fprintf(pfile,"==> hashTableDeleteSlot\n");
-    // for(int i=0;i<2;i++) {
-    //     hashTableDeleteSlot(n,i,(funcDelete_t*)&strDelete);}
+    for(int i=50;i<56;i++) {
+        hashTableDeleteSlot(n,i,(funcDelete_t*)&strDelete);}
     hashTablePrint(n,pfile,(funcPrint_t*)&strPrint);
     hashTableDelete(n,(funcDelete_t*)&strDelete);
 }

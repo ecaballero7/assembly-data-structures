@@ -52,14 +52,18 @@ void hashTableRemoveAll(hashTable_t* pTable, void* data, funcCmp_t* fc, funcDele
 {
 	for(uint32_t i = 0; i < pTable->size ; i++)
 	{
-		hashTableDeleteSlot2(pTable, i, data, fd);
+		//hashTableDeleteSlot2(pTable, i, data, fd);
+		listRemove(pTable->listArray[i], data, fc, fd);
 	}
 
 }
 
 void hashTableDeleteSlot2(hashTable_t* pTable, uint32_t i, void* data, funcDelete_t* fd)
 {
-	return 0;
+	list_t** slots = pTable->listArray;
+
+	list_t* list_delete = slots[i];
+
 }
 
 void hashTablePrint(hashTable_t* pTable, FILE *pFile, funcPrint_t* fp) 
@@ -68,7 +72,7 @@ void hashTablePrint(hashTable_t* pTable, FILE *pFile, funcPrint_t* fp)
 
 	for(uint32_t i = 0; i < pTable->size; i++)
 	{
-		fprintf(pFile, "%d", i ); fprintf(pFile, "=" );
+		fprintf(pFile, "%d", i ); fprintf(pFile, " = " );
 		listPrint(slots[i], pFile, fp);
 		fprintf(pFile, "\n");
 	}
